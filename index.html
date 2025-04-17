@@ -63,10 +63,10 @@
         // --- State Variables ---
         let timerInterval = null; // To store the interval ID
         let targetEndTime = null; // To store the exact end time timestamp
-        let remainingTime = WORK_DURATION; // Current remaining time (updated by interval)
-        let currentState = 'idle'; // 'idle', 'working', 'breakPrompt', 'break'
         const WORK_DURATION = workTimerMinutes * 60; // Work duration in seconds
         const BREAK_DURATION = breakTimerMinutes * 60; // Break duration in seconds
+        let remainingTime = WORK_DURATION; // Current remaining time (updated by interval)
+        let currentState = 'idle'; // 'idle', 'working', 'breakPrompt', 'break'
         const COOKIE_NAME = 'pomodoroHistory';
         const DEFAULT_TITLE = 'Pomodoro Timer'; // Store default title
         const TIMER_INTERVAL_MS = 200; // How often to update the timer display (milliseconds)
