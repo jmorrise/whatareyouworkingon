@@ -76,8 +76,9 @@
         const synth = new Tone.Synth().toDestination();
         function playSound() {
             Tone.start().then(() => {
-                // Play a C4 note for 0.5 seconds
                 synth.triggerAttackRelease("C4", "0.5s");
+                synth.triggerAttackRelease("E4", "0.5s");  
+                synth.triggerAttackRelease("G4", "0.5s");
                 console.log("Sound played");
             }).catch(error => {
                 console.error("Tone.js start failed:", error);
