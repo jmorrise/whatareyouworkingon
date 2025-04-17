@@ -102,9 +102,11 @@
                 // Calculate remaining seconds based on target end time
                 // Use Math.ceil to ensure the last second completes fully
                 // Use Math.max to prevent negative numbers before the final check
-                remainingTime = Math.max(0, Math.ceil((targetEndTime - now) / 1000));
-
-                updateTimerDisplay(); // Update time display and title
+                const newRemainingTime = Math.max(0, Math.ceil((targetEndTime - now) / 1000));
+                if (newRemainingTime !== remainingTime) {
+                    remainingTime = newRemainingTime; // Update the global state variable
+                    updateTimerDisplay(); // Update DOM (time display and title)
+                }
 
                 // Check if the target end time has been reached
                 if (now >= targetEndTime) {
