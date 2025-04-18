@@ -77,9 +77,6 @@
         function playSound() {
             Tone.start().then(() => {
                 synth.triggerAttackRelease("C4", "0.5s");
-                synth.triggerAttackRelease("E4", "0.5s");  
-                synth.triggerAttackRelease("G4", "0.5s");
-                console.log("Sound played");
             }).catch(error => {
                 console.error("Tone.js start failed:", error);
                 showMessage("Could not play sound.");
@@ -190,10 +187,15 @@
 
         // --- Cookie Handling ---
         function saveTaskToCookie(taskDescription) {
-            if (!taskDescription) return; // Don't save empty tasks
-
+            if (!taskDescription) return;
+            const formattedDate = new Date().toLocaleDateString('en-US', {
+                year: '2-digit',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const taskDescriptionWithDate = `[${formattedDate}] ${taskDescription}`;
             let tasks = getTasksFromCookie();
-            tasks.push(taskDescription); // Add the new task
+            tasks.push(taskDescriptionWithDate); // Add the new task
 
             const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
             document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(tasks))}; expires=${expires}; path=/; SameSite=Lax`;
@@ -250,6 +252,26 @@
             } else {
                  handleButtonClick(); // Audio context already running
             }
+        });
+
+        taskInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && currentState === 'idle') {
+                event.preventDefault();
+                 if (Tone.context.state !== 'running') {
+                    Tone.start().then(() => {
+                        console.log("Audio context started by Enter key.");
+                        handleButtonClick();
+                    }).catch(error => {
+                        console.error("Error starting Tone.js context on Enter:", error);
+                        showMessage("Could not initialize audio.");
+                    });
+                } else {
+                    handleButtonClick();
+                }
+            }
+             else if (event.key === 'Enter' && currentState === 'breakPrompt') {
+                  // Allow default behavior
+             }
         });
 
         function handleButtonClick() {
