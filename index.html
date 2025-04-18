@@ -57,7 +57,7 @@
         const messageBox = document.getElementById('messageBox');
 
         // --- Configurable Timer Durations (in minutes) ---
-        const workTimerMinutes = 10;
+        const workTimerMinutes = 25;
         const breakTimerMinutes = 5;
 
         // --- State Variables ---
@@ -69,7 +69,7 @@
         let currentState = 'idle'; // 'idle', 'working', 'breakPrompt', 'break'
         const COOKIE_NAME = 'pomodoroHistory';
         const DEFAULT_TITLE = 'Pomodoro Timer'; // Store default title
-        const TIMER_INTERVAL_MS = 200; // How often to update the timer display (milliseconds)
+        const TIMER_INTERVAL_MS = 400; // How often to update the timer display (milliseconds)
 
         // --- Sound Synthesis with Tone.js ---
         // Create a simple synth sound
