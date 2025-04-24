@@ -255,7 +255,10 @@
         });
 
         taskInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && currentState === 'idle') {
+            if (event.key != 'Enter') {
+                return;
+            }
+            if (currentState === 'idle') {
                 event.preventDefault();
                  if (Tone.context.state !== 'running') {
                     Tone.start().then(() => {
@@ -269,8 +272,9 @@
                     handleButtonClick();
                 }
             }
-             else if (event.key === 'Enter' && currentState === 'breakPrompt') {
-                  // Allow default behavior
+             else if (currentState === 'breakPrompt') {
+                  event.preventDefault();
+                  handleButtonClick();
              }
         });
 
