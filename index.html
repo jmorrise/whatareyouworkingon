@@ -72,7 +72,7 @@
         const BREAK_DURATION = breakTimerMinutes * 60; // Break duration in seconds
         let remainingTime = WORK_DURATION; // Current remaining time (updated by interval)
         let currentState = 'idle'; // 'idle', 'working', 'breakPrompt', 'break'
-        const COOKIE_NAME = 'pomodoroHistory';
+        const STORAGE_KEY = 'pomodoroHistory';
         const DEFAULT_TITLE = 'Pomodoro Timer'; // Store default title
         const TIMER_INTERVAL_MS = 400; // How often to update the timer display (milliseconds)
 
@@ -181,7 +181,7 @@
             controlButton.classList.add('bg-red-500', 'hover:bg-red-600');
             document.title = DEFAULT_TITLE; // Reset browser tab title
             updateTimerDisplay(); // Reset display to initial work time
-            loadTasksFromCookie(); // Refresh history list
+            loadTasksFromLocalStorage(); // Refresh history list
             // Clear message after a delay
              setTimeout(() => showMessage(''), 3000);
         }
@@ -190,41 +190,40 @@
             messageBox.textContent = message;
         }
 
-        // --- Cookie Handling ---
-        function saveTaskToCookie(taskDescription) {
-            if (!taskDescription) return;
+        // --- LocalStorage Handling ---
+        function saveTaskToLocalStorage(taskDescription) {
+            if (!taskDescriptionWithoutDate) return;
             const formattedDate = new Date().toLocaleDateString('en-US', {
-                year: '2-digit',
-                month: '2-digit',
-                day: '2-digit'
+                year: '2-digit', month: '2-digit', day: '2-digit'
             });
-            const taskDescriptionWithDate = `[${formattedDate}] ${taskDescription}`;
-            let tasks = getTasksFromCookie();
-            tasks.push(taskDescriptionWithDate); // Add the new task
+            const taskDescription = `[${formattedDate}] ${taskDescriptionWithoutDate}`;
 
-            const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-            document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(tasks))}; expires=${expires}; path=/; SameSite=Lax`;
-
-            updateHistoryList(tasks); // Update the UI
+            let tasks = getTasksFromLocalStorage();
+            tasks.push(taskDescription);
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+            } catch (e) {
+                console.error("Error saving to localStorage:", e);
+                showMessage("Error: Could not save task. Storage may be full.");
+            }
+            updateHistoryList(tasks);
         }
 
-        function getTasksFromCookie() {
-            const cookies = document.cookie.split('; ');
-            const cookie = cookies.find(row => row.startsWith(COOKIE_NAME + '='));
-
-            if (cookie) {
+        function getTasksFromLocalStorage() {
+            const tasksJSON = localStorage.getItem(STORAGE_KEY);
+            if (tasksJSON) {
                 try {
-                    return JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+                    return JSON.parse(tasksJSON);
                 } catch (e) {
-                    console.error("Error parsing cookie:", e);
+                    console.error("Error parsing localStorage data:", e);
                     return [];
                 }
             }
             return [];
         }
 
-        function loadTasksFromCookie() {
-            const tasks = getTasksFromCookie();
+        function loadTasksFromLocalStorage() {
+            const tasks = getTasksFromLocalStorage();
             updateHistoryList(tasks);
         }
 
@@ -302,7 +301,7 @@
             } else if (currentState === 'breakPrompt') {
                 // Save task and start break
                 const currentTask = taskInput.value.trim();
-                saveTaskToCookie(currentTask);
+                saveTaskToLocalStorage(currentTask);
 
                 currentState = 'break';
                 taskInput.disabled = true;
@@ -316,7 +315,7 @@
 
         // --- Initial Setup ---
         window.onload = () => {
-            loadTasksFromCookie(); // Load history
+            loadTasksFromLocalStorage(); // Load history
             document.title = DEFAULT_TITLE; // Set initial default title
             updateTimerDisplay(); // Set initial timer display (shows WORK_DURATION)
             showMessage("Click 'Go' to start the timer (this will also enable sound).");
